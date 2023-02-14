@@ -73,7 +73,7 @@ def on_message(*args):
                 damage = text.split(" ")[6]
                 count = text.split(" ")[3]
                 witherborn_count += 1
-                witherborn_enemies += count
+                witherborn_enemies += int(count)
 
                 if witherborn_count == 10:
                     print(f"[Info] Purse: {purse} Witherborn: Hit {witherborn_enemies} Slimes")
