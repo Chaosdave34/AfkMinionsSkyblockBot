@@ -80,7 +80,7 @@ def on_message(*args):
                 witherborn_count += 1
                 witherborn_enemies += int(count)
 
-                if witherborn_count == 2:
+                if witherborn_count == 20:
                     if prev_purse == "":
                         profit = 0
                     else:
