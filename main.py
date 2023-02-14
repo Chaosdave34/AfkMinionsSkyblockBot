@@ -1,4 +1,5 @@
 from javascript import require, On, Once
+import time
 
 mineflayer = require("mineflayer")
 
@@ -9,9 +10,12 @@ bot = mineflayer.createBot({
     "version": "1.8.9"
 })
 mode = "starting"
-purse = 0
+purse = "0"
+prev_purse = "0"
 witherborn_count = 0
 witherborn_enemies = 0
+seconds = 0
+
 
 def compile_text(chat_message):
     text = chat_message["text"]
@@ -34,7 +38,7 @@ def on_spawn(*args):
 
 @On(bot, "message")
 def on_message(*args):
-    global mode, witherborn_count, witherborn_enemies
+    global mode, witherborn_count, witherborn_enemies, seconds, prev_purse
 
     if args[2] == "chat":
         text = compile_text(args[1])
@@ -68,17 +72,21 @@ def on_message(*args):
                 return
             if "Friend >" in text:
                 return
+            if text == "":
+                return
 
             if "Witherborn" in text:
-                damage = text.split(" ")[6]
                 count = text.split(" ")[3]
                 witherborn_count += 1
                 witherborn_enemies += int(count)
 
-                if witherborn_count == 10:
-                    print(f"[Info] Purse: {purse} Witherborn: Hit {witherborn_enemies} Slimes")
+                if witherborn_count == 20:
+                    profit = (int(purse.replace(",", "")) - int(prev_purse.replace(",", ""))) * (3600 / (time.time() - seconds))
+                    print(f"[Info] Purse: {purse} | Witherborn: Hit {witherborn_enemies} Slimes | Expected Profit: {round(profit)}")
                     witherborn_enemies = 0
                     witherborn_count = 0
+                    prev_purse = purse
+                    seconds = time.time()
             elif "[Important]" in text:
                 print(text)
             elif "to warp out" in text:
@@ -91,7 +99,7 @@ def on_message(*args):
 
 @On(bot, "scoreUpdated")
 def on_score_updated(*args):
-    global purse
+    global purse, prev_purse
     if mode == "home":
         sidebar = bot.scoreboard["sidebar"]
         for item in sidebar["itemsMap"]:
@@ -99,6 +107,8 @@ def on_score_updated(*args):
             text = compile_text(display_name)
             if "Purse" in text:
                 purse = text.split(" ")[1]
+                if prev_purse == 0:
+                    prev_purse = purse
                 break
 
 
