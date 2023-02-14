@@ -10,8 +10,8 @@ bot = mineflayer.createBot({
     "version": "1.8.9"
 })
 mode = "starting"
-purse = "0"
-prev_purse = "0"
+purse = ""
+prev_purse = ""
 witherborn_count = 0
 witherborn_enemies = 0
 seconds = 0
@@ -80,8 +80,12 @@ def on_message(*args):
                 witherborn_count += 1
                 witherborn_enemies += int(count)
 
-                if witherborn_count == 20:
-                    profit = (int(purse.replace(",", "")) - int(prev_purse.replace(",", ""))) * (3600 / (time.time() - seconds))
+                if witherborn_count == 2:
+                    if prev_purse == "":
+                        profit = 0
+                    else:
+                        profit = (int(purse.replace(",", "")) - int(prev_purse.replace(",", ""))) * (3600 / (time.time() - seconds))
+
                     print(f"[Info] Purse: {purse} | Witherborn: Hit {witherborn_enemies} Slimes | Expected Profit: {round(profit)}")
                     witherborn_enemies = 0
                     witherborn_count = 0
@@ -93,13 +97,14 @@ def on_message(*args):
                 print(f"[Important] {text}")
             elif "Evacuating to Hub..." in text:
                 mode = "skyblock"
+                bot.waitForTicks(60)
             else:
                 print(f"[Chat] {text}")
 
 
 @On(bot, "scoreUpdated")
 def on_score_updated(*args):
-    global purse, prev_purse
+    global purse
     if mode == "home":
         sidebar = bot.scoreboard["sidebar"]
         for item in sidebar["itemsMap"]:
@@ -107,8 +112,6 @@ def on_score_updated(*args):
             text = compile_text(display_name)
             if "Purse" in text:
                 purse = text.split(" ")[1]
-                if prev_purse == 0:
-                    prev_purse = purse
                 break
 
 
