@@ -9,7 +9,9 @@ bot = mineflayer.createBot({
     "version": "1.8.9"
 })
 mode = "starting"
-
+purse = 0
+witherborn_count = 0
+witherborn_enemies = 0
 
 def compile_text(chat_message):
     text = chat_message["text"]
@@ -32,7 +34,7 @@ def on_spawn(*args):
 
 @On(bot, "message")
 def on_message(*args):
-    global mode
+    global mode, witherborn_count, witherborn_enemies
 
     if args[2] == "chat":
         text = compile_text(args[1])
@@ -70,7 +72,11 @@ def on_message(*args):
             if "Witherborn" in text:
                 damage = text.split(" ")[6]
                 count = text.split(" ")[3]
-                print(f"[Witherborn] Hit {count} slimes for {damage} damage.")
+                witherborn_count += 1
+                witherborn_enemies += count
+
+                if witherborn_count == 10:
+                    print(f"[Info] Purse: {purse} Witherborn: Hit {witherborn_enemies} Slimes")
             elif "[Important]" in text:
                 print(text)
             elif "to warp out" in text:
@@ -83,6 +89,7 @@ def on_message(*args):
 
 @On(bot, "scoreUpdated")
 def on_score_updated(*args):
+    global purse
     if mode == "home":
         sidebar = bot.scoreboard["sidebar"]
         for item in sidebar["itemsMap"]:
