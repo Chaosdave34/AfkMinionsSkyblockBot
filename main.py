@@ -96,5 +96,5 @@ def on_error(*args):
 
 
 @On(bot, "kick")
-def on_error(*args):
-    print("[Bot] Kick")
+def on_kick(*args):
+    print(f"[Bot] Kick!")
