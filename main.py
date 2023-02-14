@@ -55,8 +55,9 @@ def on_message(*args):
                         mode = "home"
                         bot.setQuickBarSlot(7)
                     else:
-                        print("[Bot] You are not on your Island, warping...")
-                        bot.chat("/warp home")
+                        if "" not in text or "" not in text:
+                            print("[Bot] You are not on your Island, warping...")
+                            bot.chat("/warp home")
                     break
         elif mode == "home":
             if "Mining Speed Boost" in text:
@@ -72,6 +73,8 @@ def on_message(*args):
                 print(f"[Witherborn] Hit {count} slimes for {damage} damage.")
             elif "[Important]" in text:
                 print(text)
+            elif "to warp out" in text:
+                print(f"[Important] {text}")
             elif "Evacuating to Hub..." in text:
                 mode = "skyblock"
             else:
