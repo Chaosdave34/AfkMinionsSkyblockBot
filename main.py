@@ -55,7 +55,7 @@ def on_message(*args):
                         mode = "home"
                         bot.setQuickBarSlot(7)
                     else:
-                        if "" not in text or "" not in text:
+                        if "Warping to your" not in text or "Warping..." not in text or "Sending to server" not in text:
                             print("[Bot] You are not on your Island, warping...")
                             bot.chat("/warp home")
                     break
