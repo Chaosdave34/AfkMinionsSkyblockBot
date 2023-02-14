@@ -10,6 +10,7 @@ bot = mineflayer.createBot({
 })
 mode = "starting"
 
+
 def compile_text(chat_message):
     text = chat_message["text"]
     if "extra" in chat_message:
@@ -58,12 +59,23 @@ def on_message(*args):
                         bot.chat("/warp home")
                     break
         elif mode == "home":
-            if "Guild >" not in text and "Friend >" not in text:
-                print(f"[Chat] {text}")
+            if "Mining Speed Boost" in text:
+                return
+            if "Guild >" in text:
+                return
+            if "Friend >" in text:
+                return
+
+            if "Witherborn" in text:
+                damage = text.split(" ")[6]
+                count = text.split(" ")[3]
+                print(f"[Witherborn] Hit {count} slimes for {damage} damage.")
             elif "[Important]" in text:
                 print(text)
             elif "Evacuating to Hub..." in text:
                 mode = "skyblock"
+            else:
+                print(f"[Chat] {text}")
 
 
 @On(bot, "scoreUpdated")
