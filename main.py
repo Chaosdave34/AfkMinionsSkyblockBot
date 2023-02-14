@@ -60,6 +60,10 @@ def on_message(*args):
         elif mode == "home":
             if "Guild >" not in text and "Friend >" not in text:
                 print(f"[Chat] {text}")
+            elif "[Important]" in text:
+                print(text)
+            elif "Evacuating to Hub..." in text:
+                mode = "skyblock"
 
 
 @On(bot, "scoreUpdated")
