@@ -77,6 +77,8 @@ def on_message(*args):
 
                 if witherborn_count == 10:
                     print(f"[Info] Purse: {purse} Witherborn: Hit {witherborn_enemies} Slimes")
+                    witherborn_enemies = 0
+                    witherborn_count = 0
             elif "[Important]" in text:
                 print(text)
             elif "to warp out" in text:
