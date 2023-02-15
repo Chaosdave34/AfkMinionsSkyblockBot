@@ -23,10 +23,10 @@ mode = "starting"
 purse = ""
 prev_purse = ""
 witherborn_count = 0
-witherborn_enemies = 0
 seconds = 0
 prev_enchanted_sulphur = 0
 prev_kills = 0
+earned = 0
 
 
 def compile_text(chat_message):
@@ -42,6 +42,18 @@ def compile_text(chat_message):
     return text
 
 
+def nice_coins(coins):
+    coins = str(coins)
+    length = len(coins)
+    if length > 3:
+        coins = coins[:length-3] + "," + coins[length-3:]
+
+    if len(coins) > 7:
+        coins = coins[:length-7] + "," + coins[length-7:]
+
+    return coins
+
+
 @Once(bot, "spawn")
 def on_spawn(*args):
     print("Started!")
@@ -50,7 +62,7 @@ def on_spawn(*args):
 
 @On(bot, "message")
 def on_message(*args):
-    global mode, witherborn_count, witherborn_enemies, seconds, prev_purse, prev_enchanted_sulphur, prev_kills
+    global mode, witherborn_count, seconds, prev_purse, prev_enchanted_sulphur, prev_kills, earned
 
     if args[2] == "chat":
         text = compile_text(args[1])
@@ -88,9 +100,7 @@ def on_message(*args):
                 return
 
             if "Witherborn" in text:
-                count = text.split(" ")[3]
                 witherborn_count += 1
-                witherborn_enemies += int(count)
                 slots = bot.inventory.slots
                 sulphur = 0
                 for item in slots:
@@ -108,15 +118,15 @@ def on_message(*args):
 
                 if witherborn_count == config["witherborn_count"]:
                     if prev_purse == "":
-                        print(f"[Info] Purse: {purse} | Sulphur: {sulphur}| Witherborn: Hit {witherborn_enemies} Slimes")
+                        print(f"[Info] Purse: {purse}")
                     else:
                         profit = (int(purse.replace(",", "")) - int(prev_purse.replace(",", ""))) * (3600 / (time.time() - seconds))
                         profit += ((sulphur - prev_enchanted_sulphur) * 1600) * (3600 / (time.time() - seconds))
 
-                        print(
-                            f"[Info] Purse: {purse} | Sulphur: {sulphur}| Witherborn: Hit {witherborn_enemies} Slimes | Kills: {kills - prev_kills} | Expected "
-                            f"Profit: {round(profit)}")
-                    witherborn_enemies = 0
+                        earned += int(purse.replace(",", "")) - int(prev_purse.replace(",", "")) + (sulphur - prev_enchanted_sulphur) * 1600
+
+                        print(f"[Info] Purse: {purse} coins | Kills: {kills - prev_kills} | Earned: {nice_coins(earned)} coins | "
+                              f"Expected Profit: {nice_coins(round(profit))} coins")
                     witherborn_count = 0
                     prev_purse = purse
                     seconds = time.time()
