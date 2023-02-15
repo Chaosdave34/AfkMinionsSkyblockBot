@@ -88,6 +88,7 @@ def on_message(*args):
                         if "Warping to your" not in text or "Warping..." not in text or "Sending to server" not in text:
                             print("[Bot] You are not on your Island, warping...")
                             bot.chat("/warp home")
+                            bot.waitForTicks(20)
                     break
         elif mode == "home":
             if "Mining Speed Boost" in text:
