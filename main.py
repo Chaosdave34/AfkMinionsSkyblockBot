@@ -20,15 +20,15 @@ prev_kills = 0
 
 
 def compile_text(chat_message):
-    text = chat_message["text"]
+    text = chat_message.text
     if "extra" in chat_message:
-        for extra in chat_message["extra"]:
-            if not extra["reset"]:
-                text += extra["text"]
+        for extra in chat_message.extra:
+            if not extra.reset:
+                text += extra.text
             if "extra" in extra:
-                for extra2 in extra["extra"]:
-                    if not extra2["reset"]:
-                        text += extra2["text"]
+                for extra2 in extra.extra:
+                    if not extra2.reset:
+                        text += extra2.text
     return text
 
 
@@ -53,9 +53,9 @@ def on_message(*args):
                 print("[Bot] Joined Skyblock!")
 
         elif mode == "skyblock":
-            sidebar = bot.scoreboard["sidebar"]
-            for item in sidebar["itemsMap"]:
-                display_name = sidebar["itemsMap"][item]["displayName"]
+            sidebar = bot.scoreboard.sidebar
+            for item in sidebar.itemsMap:
+                display_name = sidebar.itemsMap[item].displayName
                 text = compile_text(display_name)
                 if "⏣" in text:
                     if "Your Island" in text:
@@ -128,9 +128,9 @@ def on_message(*args):
 def on_score_updated(*args):
     global purse
     if mode == "home":
-        sidebar = bot.scoreboard["sidebar"]
-        for item in sidebar["itemsMap"]:
-            display_name = sidebar["itemsMap"][item]["displayName"]
+        sidebar = bot.scoreboard.sidebar
+        for item in sidebar.itemsMap:
+            display_name = sidebar.itemsMap[item].displayName
             text = compile_text(display_name)
             if "Purse" in text:
                 purse = text.split(" ")[1]
