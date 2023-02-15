@@ -93,9 +93,9 @@ def on_message(*args):
                         profit = 0
                     else:
                         profit = (int(purse.replace(",", "")) - int(prev_purse.replace(",", ""))) * (3600 / (time.time() - seconds))
-                        profit += (sulphur - prev_enchanted_sulphur) * 1600
+                        profit += ((sulphur - prev_enchanted_sulphur) * 1600) * (3600 / (time.time() - seconds))
 
-                    print(f"[Info] Purse: {purse} | Sulphur: {sulphur} {prev_enchanted_sulphur} | Witherborn: Hit {witherborn_enemies} Slimes | Expected Profit: {round(profit)}")
+                    print(f"[Info] Purse: {purse} | Sulphur: {sulphur}| Witherborn: Hit {witherborn_enemies} Slimes | Expected Profit: {round(profit)}")
                     witherborn_enemies = 0
                     witherborn_count = 0
                     prev_purse = purse
