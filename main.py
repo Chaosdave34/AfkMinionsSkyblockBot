@@ -1,5 +1,8 @@
+import os
+
 from javascript import require, On, Once
 import time
+import yaml
 
 mineflayer = require("mineflayer")
 
@@ -9,6 +12,13 @@ bot = mineflayer.createBot({
     "auth": "microsoft",
     "version": "1.8.9"
 })
+
+if not os.path.isfile("config.yml"):
+    with open("config.yml", "x") as writer:
+        yaml.dump({"witherborn_count": 20, "slot": 8}, writer)
+
+config = yaml.safe_load(open("config.yml"))
+
 mode = "starting"
 purse = ""
 prev_purse = ""
@@ -61,7 +71,7 @@ def on_message(*args):
                     if "Your Island" in text:
                         print("[Bot] You are on your Island!")
                         mode = "home"
-                        bot.setQuickBarSlot(7)
+                        bot.setQuickBarSlot(config["slot"] - 1)
                     else:
                         if "Warping to your" not in text or "Warping..." not in text or "Sending to server" not in text:
                             print("[Bot] You are not on your Island, warping...")
@@ -96,7 +106,7 @@ def on_message(*args):
                             kills = line.split(" ")[1].replace("§c", "")
                             kills = int(kills.replace(",", ""))
 
-                if witherborn_count == 2:
+                if witherborn_count == config["witherborn_count"]:
                     if prev_purse == "":
                         print(f"[Info] Purse: {purse} | Sulphur: {sulphur}| Witherborn: Hit {witherborn_enemies} Slimes")
                     else:
