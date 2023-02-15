@@ -93,18 +93,19 @@ def on_message(*args):
                 if bot.inventory.slots[43] is not None:
                     for line in bot.inventory.slots[43].nbt.value.display.value.Lore.value.value:
                         if "Kills:" in line:
-                            kills = line.split(" ")[1]
+                            kills = line.split(" ")[1].replace("§c", "")
+                            kills = int(kills.replace(",", ""))
 
                 if witherborn_count == 2:
                     if prev_purse == "":
-                        profit = 0
+                        print(f"[Info] Purse: {purse} | Sulphur: {sulphur}| Witherborn: Hit {witherborn_enemies} Slimes")
                     else:
                         profit = (int(purse.replace(",", "")) - int(prev_purse.replace(",", ""))) * (3600 / (time.time() - seconds))
                         profit += ((sulphur - prev_enchanted_sulphur) * 1600) * (3600 / (time.time() - seconds))
 
-                    print(
-                        f"[Info] Purse: {purse} | Sulphur: {sulphur}| Witherborn: Hit {witherborn_enemies} Slimes | Kills: {kills - prev_kills} | Expected "
-                        f"Profit: {round(profit)}")
+                        print(
+                            f"[Info] Purse: {purse} | Sulphur: {sulphur}| Witherborn: Hit {witherborn_enemies} Slimes | Kills: {kills - prev_kills} | Expected "
+                            f"Profit: {round(profit)}")
                     witherborn_enemies = 0
                     witherborn_count = 0
                     prev_purse = purse
