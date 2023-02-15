@@ -15,6 +15,7 @@ prev_purse = ""
 witherborn_count = 0
 witherborn_enemies = 0
 seconds = 0
+prev_enchanted_sulphur = 0
 
 
 def compile_text(chat_message):
@@ -38,7 +39,7 @@ def on_spawn(*args):
 
 @On(bot, "message")
 def on_message(*args):
-    global mode, witherborn_count, witherborn_enemies, seconds, prev_purse
+    global mode, witherborn_count, witherborn_enemies, seconds, prev_purse, prev_enchanted_sulphur
 
     if args[2] == "chat":
         text = compile_text(args[1])
@@ -79,18 +80,28 @@ def on_message(*args):
                 count = text.split(" ")[3]
                 witherborn_count += 1
                 witherborn_enemies += int(count)
+                slots = bot.inventory.slots
+                sulphur = 0
+                for item in slots:
+                    if item is not None:
+                        if item.name == "glowstone_dust":
+                            if "ench" in item.nbt.value:
+                                sulphur += item.count
 
                 if witherborn_count == 20:
                     if prev_purse == "":
                         profit = 0
                     else:
                         profit = (int(purse.replace(",", "")) - int(prev_purse.replace(",", ""))) * (3600 / (time.time() - seconds))
+                        profit += (sulphur - prev_enchanted_sulphur) * 1600
 
-                    print(f"[Info] Purse: {purse} | Witherborn: Hit {witherborn_enemies} Slimes | Expected Profit: {round(profit)}")
+                    print(f"[Info] Purse: {purse} | Sulphur: {sulphur} {prev_enchanted_sulphur} | Witherborn: Hit {witherborn_enemies} Slimes | Expected Profit: {round(profit)}")
                     witherborn_enemies = 0
                     witherborn_count = 0
                     prev_purse = purse
                     seconds = time.time()
+
+                    prev_enchanted_sulphur = sulphur
             elif "[Important]" in text:
                 print(text)
             elif "to warp out" in text:
