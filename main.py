@@ -16,6 +16,7 @@ witherborn_count = 0
 witherborn_enemies = 0
 seconds = 0
 prev_enchanted_sulphur = 0
+prev_kills = 0
 
 
 def compile_text(chat_message):
@@ -39,7 +40,7 @@ def on_spawn(*args):
 
 @On(bot, "message")
 def on_message(*args):
-    global mode, witherborn_count, witherborn_enemies, seconds, prev_purse, prev_enchanted_sulphur
+    global mode, witherborn_count, witherborn_enemies, seconds, prev_purse, prev_enchanted_sulphur, prev_kills
 
     if args[2] == "chat":
         text = compile_text(args[1])
@@ -88,20 +89,29 @@ def on_message(*args):
                             if "ench" in item.nbt.value:
                                 sulphur += item.count
 
-                if witherborn_count == 20:
+                kills = 0
+                if bot.inventory.slots[43] is not None:
+                    for line in bot.inventory.slots[43].nbt.value.display.value.Lore.value.value:
+                        if "Kills:" in line:
+                            kills = line.split(" ")[1]
+
+                if witherborn_count == 2:
                     if prev_purse == "":
                         profit = 0
                     else:
                         profit = (int(purse.replace(",", "")) - int(prev_purse.replace(",", ""))) * (3600 / (time.time() - seconds))
                         profit += ((sulphur - prev_enchanted_sulphur) * 1600) * (3600 / (time.time() - seconds))
 
-                    print(f"[Info] Purse: {purse} | Sulphur: {sulphur}| Witherborn: Hit {witherborn_enemies} Slimes | Expected Profit: {round(profit)}")
+                    print(
+                        f"[Info] Purse: {purse} | Sulphur: {sulphur}| Witherborn: Hit {witherborn_enemies} Slimes | Kills: {kills - prev_kills} | Expected "
+                        f"Profit: {round(profit)}")
                     witherborn_enemies = 0
                     witherborn_count = 0
                     prev_purse = purse
                     seconds = time.time()
 
                     prev_enchanted_sulphur = sulphur
+                    prev_kills = kills
             elif "[Important]" in text:
                 print(text)
             elif "to warp out" in text:
