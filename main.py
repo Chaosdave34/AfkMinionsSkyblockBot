@@ -115,7 +115,7 @@ def on_message(*args):
                 if bot.inventory.slots[43] is not None:
                     for line in bot.inventory.slots[43].nbt.value.display.value.Lore.value.value:
                         if "Kills:" in line:
-                            kills = line.split(" ")[1].replace("§c", "")
+                            kills = line.split(" ")[1].replace("§", "")
                             kills = int(kills.replace(",", ""))
 
                 if witherborn_count == config["witherborn_count"]:
@@ -143,7 +143,7 @@ def on_message(*args):
             elif "Evacuating to Hub..." in text:
                 mode = "skyblock"
                 bot.waitForTicks(60)
-            if "A disconnect occured" in text:
+            elif "A disconnect occured" in text:
                 bot.waitForTicks(60)
                 bot.chat("/skyblock")
             else:
