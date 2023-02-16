@@ -46,10 +46,10 @@ def nice_coins(coins):
     coins = str(coins)
     length = len(coins)
     if length > 3:
-        coins = coins[:length-3] + "," + coins[length-3:]
+        coins = coins[:length - 3] + "," + coins[length - 3:]
 
     if len(coins) > 7:
-        coins = coins[:length-7] + "," + coins[length-7:]
+        coins = coins[:length - 6] + "," + coins[length - 6:]
 
     return coins
 
@@ -143,6 +143,9 @@ def on_message(*args):
             elif "Evacuating to Hub..." in text:
                 mode = "skyblock"
                 bot.waitForTicks(60)
+            if "A disconnect occured" in text:
+                bot.waitForTicks(60)
+                bot.chat("/skyblock")
             else:
                 print(f"[Chat] {text}")
 
