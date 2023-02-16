@@ -84,6 +84,17 @@ def on_message(*args):
                         print("[Bot] You are on your Island!")
                         mode = "home"
                         bot.setQuickBarSlot(config["slot"] - 1)
+
+                        armor_pieces = []
+                        for i in range(4):
+                            i += 5
+                            armor_pieces.append(bot.inventory.slots[i].nbt.value.display.value.Name.value)
+
+                        if all(["Goldor" in x for x in armor_pieces]):
+                            print("[Bot] Correct Armor Set equipped!")
+                        else:
+                            print("[Bot] Wrong Armor Set equipped!")
+
                     else:
                         print("[Bot] You are not on your Island, warping...")
                         bot.chat("/warp home")
