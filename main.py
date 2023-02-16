@@ -3,12 +3,13 @@ import os
 from javascript import require, On, Once
 import time
 import yaml
+import requests
 
 mineflayer = require("mineflayer")
 
 if not os.path.isfile("config.yml"):
     with open("config.yml", "x") as writer:
-        yaml.dump({"witherborn_count": 20, "slot": 8, "email": ""}, writer)
+        yaml.dump({"witherborn_count": 20, "slot": 8, "email": "", "key": ""}, writer)
 
 config = yaml.safe_load(open("config.yml"))
 
@@ -25,6 +26,7 @@ prev_purse = ""
 witherborn_count = 0
 seconds = 0
 prev_enchanted_sulphur = 0
+prev_slime_balls = 0
 prev_kills = 0
 earned = 0
 
@@ -54,6 +56,50 @@ def nice_coins(coins):
     return coins
 
 
+def get_profiles():
+    response = requests.get("https://api.hypixel.net/skyblock/profiles", params={"key": config["key"], "uuid": username_to_uuid(bot.player.username)})
+    try:
+        response = response.json()
+    except requests.exceptions.JSONDecodeError:
+        response = None
+
+    return response["profiles"] if response is not None else None
+
+
+def get_slime_balls():
+    profiles = get_profiles()
+
+    if profiles is not None:
+        for profile in profiles:
+            if profile["selected"]:
+                user_profile_info = profile["members"][username_to_uuid(bot.player.username)]
+
+                return user_profile_info["sacks_counts"]["ENCHANTED_SLIME_BALL"]
+
+
+def get_active_pet():
+    profiles = get_profiles()
+
+    if profiles is not None:
+        for profile in profiles:
+            if profile["selected"]:
+                pets = profile["members"][username_to_uuid(bot.player.username)]["pets"]
+
+                for pet in pets:
+                    if pet["active"]:
+                        return pet["type"]
+
+
+def username_to_uuid(username):
+    response = requests.get(f"https://api.mojang.com/users/profiles/minecraft/{username}")
+    try:
+        response = response.json()
+    except requests.exceptions.JSONDecodeError:
+        response = None
+
+    return response["id"] if response is not None else None
+
+
 @Once(bot, "spawn")
 def on_spawn(*args):
     print("Started!")
@@ -62,7 +108,7 @@ def on_spawn(*args):
 
 @On(bot, "message")
 def on_message(*args):
-    global mode, witherborn_count, seconds, prev_purse, prev_enchanted_sulphur, prev_kills, earned
+    global mode, witherborn_count, seconds, prev_purse, prev_enchanted_sulphur, prev_kills, earned, prev_slime_balls
 
     if args[2] == "chat":
         text = compile_text(args[1])
@@ -94,6 +140,7 @@ def on_message(*args):
                             print("[Bot] Correct Armor Set equipped!")
                         else:
                             print("[Bot] Wrong Armor Set equipped!")
+                        print(f"[Bot] Active Pet: {get_active_pet()}")
 
                     else:
                         print("[Bot] You are not on your Island, warping...")
@@ -130,11 +177,14 @@ def on_message(*args):
                             kills = int(kills.replace(",", ""))
 
                 if witherborn_count == config["witherborn_count"]:
+                    slime_balls = get_slime_balls()
+
                     if prev_purse == "":
                         print(f"[Info] Purse: {purse}")
                     else:
                         profit = (int(purse.replace(",", "")) - int(prev_purse.replace(",", ""))) * (3600 / (time.time() - seconds))
                         profit += ((sulphur - prev_enchanted_sulphur) * 1600) * (3600 / (time.time() - seconds))
+                        profit += ((slime_balls - prev_slime_balls) * 1200) * (3600 / (time.time() - seconds))
 
                         earned += int(purse.replace(",", "")) - int(prev_purse.replace(",", "")) + (sulphur - prev_enchanted_sulphur) * 1600
 
@@ -145,6 +195,7 @@ def on_message(*args):
                     seconds = time.time()
 
                     prev_enchanted_sulphur = sulphur
+                    prev_slime_balls = slime_balls
                     prev_kills = kills
 
             elif "[Important]" in text:
