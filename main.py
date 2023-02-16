@@ -6,18 +6,18 @@ import yaml
 
 mineflayer = require("mineflayer")
 
+if not os.path.isfile("config.yml"):
+    with open("config.yml", "x") as writer:
+        yaml.dump({"witherborn_count": 20, "slot": 8, "email": ""}, writer)
+
+config = yaml.safe_load(open("config.yml"))
+
 bot = mineflayer.createBot({
     "host": "hypixel.net",
-    "username": "dfa-team@outlook.de",
+    "username": config["email"],
     "auth": "microsoft",
     "version": "1.8.9"
 })
-
-if not os.path.isfile("config.yml"):
-    with open("config.yml", "x") as writer:
-        yaml.dump({"witherborn_count": 20, "slot": 8}, writer)
-
-config = yaml.safe_load(open("config.yml"))
 
 mode = "starting"
 purse = ""
@@ -165,7 +165,7 @@ def on_score_updated(*args):
 
 @On(bot, "error")
 def on_error(*args):
-    print("[Bot] Error")
+    print("[Bot] Error!")
 
 
 @On(bot, "kick")
