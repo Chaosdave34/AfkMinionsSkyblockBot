@@ -21,14 +21,17 @@ bot = mineflayer.createBot({
 })
 
 mode = "starting"
+
 purse = ""
 prev_purse = ""
+earned = 0
+
 witherborn_count = 0
 seconds = 0
+
 prev_enchanted_sulphur = 0
 prev_slime_balls = 0
 prev_kills = 0
-earned = 0
 
 
 def compile_text(chat_message):
@@ -59,11 +62,9 @@ def nice_coins(coins):
 def get_profiles():
     response = requests.get("https://api.hypixel.net/skyblock/profiles", params={"key": config["key"], "uuid": username_to_uuid(bot.player.username)})
     try:
-        response = response.json()
+        return response.json()["profiles"]
     except requests.exceptions.JSONDecodeError:
-        response = None
-
-    return response["profiles"] if response is not None else None
+        return None
 
 
 def get_slime_balls():
@@ -72,9 +73,9 @@ def get_slime_balls():
     if profiles is not None:
         for profile in profiles:
             if profile["selected"]:
-                user_profile_info = profile["members"][username_to_uuid(bot.player.username)]
+                return profile["members"][username_to_uuid(bot.player.username)]["sacks_counts"]["ENCHANTED_SLIME_BALL"]
 
-                return user_profile_info["sacks_counts"]["ENCHANTED_SLIME_BALL"]
+    return 0
 
 
 def get_active_pet():
@@ -88,16 +89,15 @@ def get_active_pet():
                 for pet in pets:
                     if pet["active"]:
                         return pet["type"]
+    return "NONE"
 
 
 def username_to_uuid(username):
     response = requests.get(f"https://api.mojang.com/users/profiles/minecraft/{username}")
     try:
-        response = response.json()
+        return response.json()["id"]
     except requests.exceptions.JSONDecodeError:
-        response = None
-
-    return response["id"] if response is not None else None
+        return None
 
 
 @Once(bot, "spawn")
@@ -108,7 +108,7 @@ def on_spawn(*args):
 
 @On(bot, "message")
 def on_message(*args):
-    global mode, witherborn_count, seconds, prev_purse, prev_enchanted_sulphur, prev_kills, earned, prev_slime_balls
+    global mode, prev_purse, earned, witherborn_count, seconds, prev_enchanted_sulphur, prev_slime_balls, prev_kills
 
     if args[2] == "chat":
         text = compile_text(args[1])
@@ -123,8 +123,8 @@ def on_message(*args):
         elif mode == "skyblock":
             sidebar = bot.scoreboard.sidebar
             for item in sidebar.itemsMap:
-                display_name = sidebar.itemsMap[item].displayName
-                text = compile_text(display_name)
+                text = compile_text(sidebar.itemsMap[item].displayName)
+
                 if "⏣" in text:
                     if "Your Island" in text:
                         print("[Bot] You are on your Island!")
@@ -133,8 +133,7 @@ def on_message(*args):
 
                         armor_pieces = []
                         for i in range(4):
-                            i += 5
-                            armor_pieces.append(bot.inventory.slots[i].nbt.value.display.value.Name.value)
+                            armor_pieces.append(bot.inventory.slots[i + 5].nbt.value.display.value.Name.value)
 
                         if all(["Goldor" in x for x in armor_pieces]):
                             print("[Bot] Correct Armor Set equipped!")
@@ -161,6 +160,7 @@ def on_message(*args):
 
             if "Witherborn" in text:
                 witherborn_count += 1
+
                 slots = bot.inventory.slots
                 sulphur = 0
                 for item in slots:
@@ -182,16 +182,20 @@ def on_message(*args):
                     if prev_purse == "":
                         print(f"[Info] Purse: {purse}")
                     else:
-                        profit = (int(purse.replace(",", "")) - int(prev_purse.replace(",", ""))) * (3600 / (time.time() - seconds))
-                        profit += ((sulphur - prev_enchanted_sulphur) * 1600) * (3600 / (time.time() - seconds))
-                        profit += ((slime_balls - prev_slime_balls) * 1200) * (3600 / (time.time() - seconds))
+                        profit = int(purse.replace(",", "")) - int(prev_purse.replace(",", ""))
+                        profit += (sulphur - prev_enchanted_sulphur) * 1600
+                        profit += (slime_balls - prev_slime_balls) * 1200
+                        profit *= 3600 / (time.time() - seconds)
 
-                        earned += int(purse.replace(",", "")) - int(prev_purse.replace(",", "")) + (sulphur - prev_enchanted_sulphur) * 1600
+                        earned += int(purse.replace(",", "")) - int(prev_purse.replace(",", "")) + ((sulphur - prev_enchanted_sulphur) * 1600) + (
+                                    (slime_balls - prev_slime_balls) * 1200)
 
                         print(f"[Info] Purse: {purse} coins | Kills: {kills - prev_kills} | Earned: {nice_coins(earned)} coins | "
                               f"Expected Profit: {nice_coins(round(profit))} coins")
-                    witherborn_count = 0
+
                     prev_purse = purse
+
+                    witherborn_count = 0
                     seconds = time.time()
 
                     prev_enchanted_sulphur = sulphur
@@ -218,8 +222,7 @@ def on_score_updated(*args):
     if mode == "home":
         sidebar = bot.scoreboard.sidebar
         for item in sidebar.itemsMap:
-            display_name = sidebar.itemsMap[item].displayName
-            text = compile_text(display_name)
+            text = compile_text(sidebar.itemsMap[item].displayName)
             if "Purse" in text:
                 purse = text.split(" ")[1]
                 break
