@@ -135,7 +135,7 @@ def on_message(*args):
                         for i in range(4):
                             armor_pieces.append(bot.inventory.slots[i + 5].nbt.value.display.value.Name.value)
 
-                        if all(["Goldor" in x for x in armor_pieces]):
+                        if any([all([armor in x for x in armor_pieces])] for armor in ["Goldor", "Maxor", "Necron", "Storm", "Wither"]):
                             print("[Bot] Correct Armor Set equipped!")
                         else:
                             print("[Bot] Wrong Armor Set equipped!")
