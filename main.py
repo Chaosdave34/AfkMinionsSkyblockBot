@@ -67,6 +67,14 @@ def get_profiles():
         return None
 
 
+def get_bazaar():
+    response = requests.get("https://api.hypixel.net/skyblock/bazaar", params={"key": config["key"]})
+    try:
+        return response.json()["products"]
+    except requests.exceptions.JSONDecodeError:
+        return None
+
+
 def get_slime_balls():
     profiles = get_profiles()
 
@@ -77,6 +85,12 @@ def get_slime_balls():
 
     return 0
 
+
+def get_slime_ball_prices():
+    products = get_bazaar()
+    if products is not None:
+        return products["ENCHANTED_SLIME_BALL"]["quick_status"]["sellPrice"]
+    return 0
 
 def get_active_pet():
     profiles = get_profiles()
@@ -184,11 +198,11 @@ def on_message(*args):
                     else:
                         profit = int(purse.replace(",", "")) - int(prev_purse.replace(",", ""))
                         profit += (sulphur - prev_enchanted_sulphur) * 1600
-                        profit += (slime_balls - prev_slime_balls) * 1200
+                        profit += (slime_balls - prev_slime_balls) * get_slime_ball_prices()
                         profit *= 3600 / (time.time() - seconds)
 
                         earned += int(purse.replace(",", "")) - int(prev_purse.replace(",", "")) + ((sulphur - prev_enchanted_sulphur) * 1600) + (
-                                    (slime_balls - prev_slime_balls) * 1200)
+                                (slime_balls - prev_slime_balls) * 1200)
 
                         print(f"[Info] Purse: {purse} coins | Kills: {kills - prev_kills} | Earned: {nice_coins(earned)} coins | "
                               f"Expected Profit: {nice_coins(round(profit))} coins")
