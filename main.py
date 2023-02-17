@@ -177,10 +177,12 @@ def on_message(*args):
                             kills = int(kills.replace(",", ""))
 
                 if witherborn_count == config["witherborn_count"]:
+                    ping = bot.player.ping
+
                     slime_balls = get_slime_balls()
 
                     if prev_purse == "":
-                        print(f"[Info] Purse: {purse}")
+                        print(f"[Info] Purse: {purse} | Ping: {ping}ms")
                     else:
                         profit = int(purse.replace(",", "")) - int(prev_purse.replace(",", ""))
                         profit += (sulphur - prev_enchanted_sulphur) * 1600
@@ -191,7 +193,7 @@ def on_message(*args):
                                     (slime_balls - prev_slime_balls) * 1200)
 
                         print(f"[Info] Purse: {purse} coins | Kills: {kills - prev_kills} | Earned: {nice_coins(earned)} coins | "
-                              f"Expected Profit: {nice_coins(round(profit))} coins")
+                              f"Expected Profit: {nice_coins(round(profit))} coins | Ping: {ping}ms")
 
                     prev_purse = purse
 
