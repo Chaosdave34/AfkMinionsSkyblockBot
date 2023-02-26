@@ -225,6 +225,12 @@ def on_message(*args):
             elif "A disconnect occured" in text:
                 bot.waitForTicks(60)
                 bot.chat("/skyblock")
+            elif "Out of sync" in text:
+                bot.waitForTicks(60)
+                bot.chat("/lobby")
+                bot.waitForTicks(60)
+                bot.chat("/skyblock")
+                mode = "starting"
             else:
                 print(f"[Chat] {text}")
 
