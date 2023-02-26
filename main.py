@@ -82,7 +82,6 @@ def get_slime_balls():
         for profile in profiles:
             if profile["selected"]:
                 return profile["members"][username_to_uuid(bot.player.username)]["sacks_counts"]["ENCHANTED_SLIME_BALL"]
-
     return 0
 
 
@@ -199,10 +198,10 @@ def on_message(*args):
                         profit = int(purse.replace(",", "")) - int(prev_purse.replace(",", ""))
                         profit += (sulphur - prev_enchanted_sulphur) * 1600
                         profit += (slime_balls - prev_slime_balls) * get_slime_ball_prices()
-                        profit *= 3600 / (time.time() - seconds)
 
-                        earned += int(purse.replace(",", "")) - int(prev_purse.replace(",", "")) + ((sulphur - prev_enchanted_sulphur) * 1600) + (
-                                (slime_balls - prev_slime_balls) * 1200)
+                        earned = profit
+
+                        profit *= 3600 / (time.time() - seconds)
 
                         print(f"[Info] Purse: {purse} coins | Kills: {kills - prev_kills} | Earned: {nice_coins(earned)} coins | "
                               f"Expected Profit: {nice_coins(round(profit))} coins")
