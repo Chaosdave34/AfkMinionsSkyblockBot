@@ -91,6 +91,7 @@ def get_slime_ball_prices():
         return products["ENCHANTED_SLIME_BALL"]["quick_status"]["sellPrice"]
     return 0
 
+
 def get_active_pet():
     profiles = get_profiles()
 
@@ -183,6 +184,9 @@ def on_message(*args):
                         if item.name == "glowstone_dust":
                             if "ench" in item.nbt.value:
                                 sulphur += item.count
+                        elif item.name == "skull":
+                            if "Enchanted Sulphur Cube" in item.nbt.value.display.value.Name.value:
+                                sulphur += 160 * item.count
 
                 kills = 0
                 if bot.inventory.slots[43] is not None:
