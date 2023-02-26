@@ -201,7 +201,7 @@ def on_message(*args):
                         profit += (sulphur - prev_enchanted_sulphur) * 1600
                         profit += (slime_balls - prev_slime_balls) * get_slime_ball_prices()
 
-                        earned = profit
+                        earned += int(profit)
 
                         profit *= 3600 / (time.time() - seconds)
 
