@@ -22,7 +22,6 @@ bot = mineflayer.createBot({
 
 mode = "starting"
 
-purse = ""
 prev_purse = ""
 earned = 0
 
@@ -202,6 +201,14 @@ def on_message(*args):
                 if witherborn_count == config["witherborn_count"]:
                     slime_balls = get_slime_balls()
 
+                    purse = 0
+                    sidebar = bot.scoreboard.sidebar
+                    for item in sidebar.itemsMap:
+                        text = compile_text(sidebar.itemsMap[item].displayName)
+                        if "Purse" in text:
+                            purse = text.split(" ")[1]
+                            break
+
                     if prev_purse == "":
                         print(f"[Info] Purse: {purse}")
                     else:
@@ -243,18 +250,6 @@ def on_message(*args):
                 mode = "starting"
             else:
                 print(f"[Chat] {text}")
-
-
-@On(bot, "scoreUpdated")
-def on_score_updated(*args):
-    global purse
-    if mode == "home":
-        sidebar = bot.scoreboard.sidebar
-        for item in sidebar.itemsMap:
-            text = compile_text(sidebar.itemsMap[item].displayName)
-            if "Purse" in text:
-                purse = text.split(" ")[1]
-                break
 
 
 @On(bot, "error")
