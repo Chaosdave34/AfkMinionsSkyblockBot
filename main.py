@@ -155,6 +155,10 @@ def on_message(*args):
                             print("[Bot] Wrong Armor Set equipped!")
                         print(f"[Bot] Active Pet: {get_active_pet()}")
 
+                        if bot.inventory.slots[config["slot"] - 1] is not None:
+                            print(
+                                f"[Bot] Selected Item: {bot.inventory.slots[bot.inventory.hotbarStart + config['slot'] - 1].nbt.value.display.value.Name.value}")
+
                     else:
                         print("[Bot] You are not on your Island, warping...")
                         bot.chat("/warp home")
