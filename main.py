@@ -170,6 +170,8 @@ def on_message(*args):
                 return
             if any([x in text for x in ["Watchdog", "WATCHDOG", "Staff have banned", "Blacklisted modifications"]]):
                 return
+            if "Teleport Pad" in text or "You fell into the void" in text:
+                return
 
             if "Witherborn" in text:
                 witherborn_count += 1
