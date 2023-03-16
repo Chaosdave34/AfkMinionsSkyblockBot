@@ -27,6 +27,8 @@ prev_enchanted_sulphur = 0
 prev_slime_balls = 0
 prev_kills = 0
 
+cap_hit_count = 0
+
 
 @Once(bot, "spawn")
 def on_spawn(*args):
@@ -39,7 +41,7 @@ def on_spawn(*args):
 
 @On(bot, "message")
 def on_message(*args):
-    global mode, prev_purse, earned, witherborn_count, seconds, prev_enchanted_sulphur, prev_slime_balls, prev_kills
+    global mode, prev_purse, earned, witherborn_count, seconds, prev_enchanted_sulphur, prev_slime_balls, prev_kills, cap_hit_count
 
     if args[2] == "chat":
         text = utils.compile_text(args[1])
@@ -112,7 +114,7 @@ def on_message(*args):
                         profit *= 3600 / (time.time() - seconds)
 
                         print(f"[Info] Purse: {utils.format_coins(purse)} coins | Kills: {kills - prev_kills} | Earned: {utils.format_coins(earned)} coins | "
-                              f"Expected Profit: {utils.format_coins(round(profit))} coins")
+                              f"Expected Profit: {utils.format_coins(round(profit))} coins | Slime cap hit {cap_hit_count} times")
 
                     prev_purse = purse
 
@@ -123,6 +125,10 @@ def on_message(*args):
                     prev_slime_balls = slime_balls
                     prev_kills = kills
 
+                    cap_hit_count = 0
+
+            elif "You have reached the maximum number of Slimes allowed on your island." in text:
+                cap_hit_count += 1
             elif "[Important]" in text:
                 print(text)
             elif "to warp out" in text:
