@@ -96,7 +96,7 @@ def on_message(*args):
 
                 message = []
 
-                if any([all([armor in x for x in armor_pieces])] for armor in ["Goldor", "Maxor", "Necron", "Storm", "Wither"]):
+                if all(["Shark" in x for x in armor_pieces]):
                     message.append("Correct Armor Set equipped!")
                 else:
                     message.append("Wrong Armor Set equipped!")
