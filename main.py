@@ -20,8 +20,7 @@ mode = "starting"
 prev_purse = ""
 earned = 0
 
-witherborn_count = 0
-seconds = 0
+seconds = time.time()
 
 prev_enchanted_sulphur = 0
 prev_slime_balls = 0
@@ -39,9 +38,46 @@ def on_spawn(*args):
     bot.chat("/skyblock")
 
 
+@On(bot, "teamUpdated")
+def on_team_updated(*args):
+    global mode, prev_purse, earned, seconds, prev_enchanted_sulphur, prev_slime_balls, prev_kills, cap_hit_count
+
+    if mode == "home":
+        if time.time() - seconds > config["timer_min"] * 60:
+            purse = utils.get_purse()
+            kills = utils.get_kill_count()
+            sulphur = utils.get_sulphur_count()
+            slime_balls = utils.get_enchanted_slime_ball_count()
+
+            if prev_purse == "":
+                print(f"[Info] Purse: {utils.format_coins(purse)}")
+            else:
+                profit = purse - prev_purse
+                profit += (sulphur - prev_enchanted_sulphur) * 1600
+                profit += (slime_balls - prev_slime_balls) * utils.get_enchanted_slime_ball_price()
+
+                earned += int(profit)
+
+                profit *= (3600 / (config["timer_min"] * 60))
+                print(earned, profit, config["timer_min"]*60)
+
+                print(f"[Info] Purse: {utils.format_coins(purse)} coins | Kills: {kills - prev_kills} | Earned: {utils.format_coins(earned)} coins | "
+                      f"Expected Profit: {utils.format_coins(round(profit))} coins | Slime cap hit {cap_hit_count} times")
+
+            prev_purse = purse
+
+            seconds = time.time()
+
+            prev_enchanted_sulphur = sulphur
+            prev_slime_balls = slime_balls
+            prev_kills = kills
+
+            cap_hit_count = 0
+
+
 @On(bot, "message")
 def on_message(*args):
-    global mode, prev_purse, earned, witherborn_count, seconds, prev_enchanted_sulphur, prev_slime_balls, prev_kills, cap_hit_count
+    global mode, cap_hit_count
 
     if args[2] == "chat":
         text = utils.compile_text(args[1])
@@ -93,41 +129,8 @@ def on_message(*args):
             if "Teleport Pad" in text or "You fell into the void" in text:
                 return
 
-            if "Witherborn" in text:
-                witherborn_count += 1
-
-                if witherborn_count == config["witherborn_count"]:
-                    purse = utils.get_purse()
-                    sulphur = utils.get_sulphur_count()
-                    kills = utils.get_kill_count()
-                    slime_balls = utils.get_enchanted_slime_ball_count()
-
-                    if prev_purse == "":
-                        print(f"[Info] Purse: {utils.format_coins(purse)}")
-                    else:
-                        profit = purse - prev_purse
-                        profit += (sulphur - prev_enchanted_sulphur) * 1600
-                        profit += (slime_balls - prev_slime_balls) * utils.get_enchanted_slime_ball_price()
-
-                        earned += int(profit)
-
-                        profit *= 3600 / (time.time() - seconds)
-
-                        print(f"[Info] Purse: {utils.format_coins(purse)} coins | Kills: {kills - prev_kills} | Earned: {utils.format_coins(earned)} coins | "
-                              f"Expected Profit: {utils.format_coins(round(profit))} coins | Slime cap hit {cap_hit_count} times")
-
-                    prev_purse = purse
-
-                    witherborn_count = 0
-                    seconds = time.time()
-
-                    prev_enchanted_sulphur = sulphur
-                    prev_slime_balls = slime_balls
-                    prev_kills = kills
-
-                    cap_hit_count = 0
-
-            elif "You have reached the maximum number of Slimes allowed on your island." in text:
+            # Filter
+            if "You have reached the maximum number of Slimes allowed on your island." in text:
                 cap_hit_count += 1
             elif "[Important]" in text:
                 print(text)

@@ -154,6 +154,6 @@ class Utils:
 def read_config() -> dict:
     if not os.path.isfile("config.yml"):
         with open("config.yml", "x") as writer:
-            yaml.dump({"witherborn_count": 20, "slot": 8, "email": "", "key": ""}, writer)
+            yaml.dump({"timer_min": 20, "slot": 8, "email": "", "key": ""}, writer)
 
     return yaml.safe_load(open("config.yml"))
