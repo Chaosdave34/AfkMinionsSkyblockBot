@@ -59,7 +59,6 @@ def on_team_updated(*args):
                 earned += int(profit)
 
                 profit *= (3600 / (config["timer_min"] * 60))
-                print(earned, profit, config["timer_min"]*60)
 
                 print(f"[Info] Purse: {utils.format_coins(purse)} coins | Kills: {kills - prev_kills} | Earned: {utils.format_coins(earned)} coins | "
                       f"Expected Profit: {utils.format_coins(round(profit))} coins | Slime cap hit {cap_hit_count} times")
