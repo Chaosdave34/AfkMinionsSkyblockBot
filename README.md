@@ -1,1 +1,1 @@
-Mineflayer Script to AFK Slime Minions on Hypixel Skyblock
+Mineflayer Script to AFK Minions on Hypixel Skyblock

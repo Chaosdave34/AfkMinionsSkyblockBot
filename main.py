@@ -1,5 +1,4 @@
 from javascript import require, On, Once
-import time
 import utils
 
 mineflayer = require("mineflayer")
@@ -17,17 +16,6 @@ utils = utils.Utils()
 
 mode = "starting"
 
-prev_purse = ""
-earned = 0
-
-seconds = time.time()
-
-prev_enchanted_sulphur = 0
-prev_slime_balls = 0
-prev_kills = 0
-
-cap_hit_count = 0
-
 
 @Once(bot, "spawn")
 def on_spawn(*args):
@@ -38,45 +26,9 @@ def on_spawn(*args):
     bot.chat("/skyblock")
 
 
-@On(bot, "teamUpdated")
-def on_team_updated(*args):
-    global mode, prev_purse, earned, seconds, prev_enchanted_sulphur, prev_slime_balls, prev_kills, cap_hit_count
-
-    if mode == "home":
-        if time.time() - seconds > config["timer_min"] * 60:
-            purse = utils.get_purse()
-            kills = utils.get_kill_count()
-            sulphur = utils.get_sulphur_count()
-            slime_balls = utils.get_enchanted_slime_ball_count()
-
-            if prev_purse == "":
-                print(f"[Info] Purse: {utils.format_coins(purse)}")
-            else:
-                profit = purse - prev_purse
-                profit += (sulphur - prev_enchanted_sulphur) * 1600
-                profit += (slime_balls - prev_slime_balls) * utils.get_enchanted_slime_ball_price()
-
-                earned += int(profit)
-
-                profit *= (3600 / (config["timer_min"] * 60))
-
-                print(f"[Info] Purse: {utils.format_coins(purse)} coins | Kills: {kills - prev_kills} | Earned: {utils.format_coins(earned)} coins | "
-                      f"Expected Profit: {utils.format_coins(round(profit))} coins | Slime cap hit {cap_hit_count} times")
-
-            prev_purse = purse
-
-            seconds = time.time()
-
-            prev_enchanted_sulphur = sulphur
-            prev_slime_balls = slime_balls
-            prev_kills = kills
-
-            cap_hit_count = 0
-
-
 @On(bot, "message")
 def on_message(*args):
-    global mode, cap_hit_count
+    global mode
 
     if args[2] == "chat":
         text = utils.compile_text(args[1])
@@ -90,25 +42,8 @@ def on_message(*args):
             if utils.get_location() == "Your Island":
                 print("[Bot] You are on your Island!")
                 mode = "home"
-                bot.setQuickBarSlot(config["slot"] - 1)
 
-                armor_pieces = utils.get_armor_piece_names()
-
-                message = []
-
-                if all(["Shark" in x for x in armor_pieces]):
-                    message.append("Correct Armor Set equipped!")
-                else:
-                    message.append("Wrong Armor Set equipped!")
-
-                if "Daedalus Axe" in utils.get_selected_item_name():
-                    message.append("Daedalus Axe selected!")
-                else:
-                    message.append("Daedalus Axe NOT selected!")
-
-                message.append(f"Active Pet: {utils.get_active_pet()}")
-
-                print("[Bot] " + " | ".join(message))
+                print(f"[Bot] Active PEt: {utils.get_active_pet()}")
 
             else:
                 print("[Bot] You are not on your Island, warping...")
@@ -129,9 +64,7 @@ def on_message(*args):
                 return
 
             # Filter
-            if "You have reached the maximum number of Slimes allowed on your island." in text:
-                cap_hit_count += 1
-            elif "[Important]" in text:
+            if "[Important]" in text:
                 print(text)
             elif "to warp out" in text:
                 print(f"[Important] {text}")
