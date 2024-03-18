@@ -1,3 +1,5 @@
+import enum
+
 from javascript import require, On, Once
 import utils
 
@@ -14,14 +16,33 @@ bot = mineflayer.createBot({
 
 utils = utils.Utils()
 
-mode = "starting"
+
+class Mode(enum.Enum):
+    STARTING = 1
+    SKYBLOCK = 2
+    HOME = 3
+
+
+mode = Mode.STARTING
+
+filter_list = [
+    "Mining Speed Boost",
+    "Guild >",
+    "Friend >",
+    "✆",
+    "Watchdog",
+    "WATCHDOG",
+    "Staff have banned",
+    "Blacklisted modifications"
+]
 
 
 @Once(bot, "spawn")
-def on_spawn(*args):
+def on_spawn(*_args):
     utils.init(bot, config["key"])
 
     print("[Bot] Joined Hypixel")
+
     bot.waitForTicks(60)
     bot.chat("/skyblock")
 
@@ -33,62 +54,57 @@ def on_message(*args):
     if args[2] == "chat":
         text = utils.compile_text(args[1])
 
-        if mode == "starting":
+        if mode == Mode.STARTING:
             if "Welcome to Hypixel SkyBlock!" in text:
-                mode = "skyblock"
                 print("[Bot] Joined Skyblock!")
+                mode = Mode.SKYBLOCK
 
-        elif mode == "skyblock":
+        elif mode == Mode.SKYBLOCK:
             if utils.get_location() == "Your Island":
                 print("[Bot] You are on your Island!")
-                mode = "home"
-
-                print(f"[Bot] Active PEt: {utils.get_active_pet()}")
+                mode = Mode.HOME
 
             else:
                 print("[Bot] You are not on your Island, warping...")
-                bot.chat("/warp home")
                 bot.waitForTicks(20)
-        elif mode == "home":
-            if "Mining Speed Boost" in text:
-                return
-            if "Guild >" in text:
-                return
-            if "Friend >" in text:
-                return
+                bot.chat("/warp home")
+
+        elif mode == Mode.HOME:
             if text == "":
                 return
-            if any([x in text for x in ["Watchdog", "WATCHDOG", "Staff have banned", "Blacklisted modifications"]]):
-                return
-            if "Teleport Pad" in text or "You fell into the void" in text:
+            elif any([x in text for x in filter_list]):
                 return
 
             # Filter
             if "[Important]" in text:
                 print(text)
+
             elif "to warp out" in text:
                 print(f"[Important] {text}")
+
             elif "Evacuating to Hub..." in text:
-                mode = "skyblock"
+                mode = Mode.SKYBLOCK
                 bot.waitForTicks(60)
+
             elif "A disconnect occured" in text:
                 bot.waitForTicks(60)
                 bot.chat("/skyblock")
+
             elif "Out of sync" in text:
                 bot.waitForTicks(60)
                 bot.chat("/lobby")
                 bot.waitForTicks(60)
                 bot.chat("/skyblock")
-                mode = "starting"
+                mode = Mode.SKYBLOCK
             else:
                 print(f"[Chat] {text}")
 
 
 @On(bot, "error")
-def on_error(*args):
+def on_error(*_args):
     print("[Bot] Error!")
 
 
 @On(bot, "kick")
-def on_kick(*args):
+def on_kick(*_args):
     print(f"[Bot] Kick!")
