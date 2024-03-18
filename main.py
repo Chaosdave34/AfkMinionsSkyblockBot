@@ -1,11 +1,13 @@
 import enum
 
 from javascript import require, On, Once
+
 import utils
 
-mineflayer = require("mineflayer")
-
+utils = utils.Utils()
 config = utils.read_config()
+
+mineflayer = require("mineflayer")
 
 bot = mineflayer.createBot({
     "host": "hypixel.net",
@@ -13,8 +15,6 @@ bot = mineflayer.createBot({
     "auth": "microsoft",
     "version": "1.8.9"
 })
-
-utils = utils.Utils()
 
 
 class Mode(enum.Enum):
@@ -33,13 +33,16 @@ filter_list = [
     "Watchdog",
     "WATCHDOG",
     "Staff have banned",
-    "Blacklisted modifications"
+    "Blacklisted modifications",
+    "Latest update",
+    "Profile ID",
+    "playing on profile"
 ]
 
 
 @Once(bot, "spawn")
 def on_spawn(*_args):
-    utils.init(bot, config["key"])
+    utils.init(bot)
 
     print("[Bot] Joined Hypixel")
 

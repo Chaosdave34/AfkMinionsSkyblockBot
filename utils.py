@@ -36,10 +36,10 @@ class Utils:
 
         return location
 
+    @staticmethod
+    def read_config() -> dict:
+        if not os.path.isfile("config.yml"):
+            with open("config.yml", "x") as writer:
+                yaml.dump({"email": ""}, writer)
 
-def read_config() -> dict:
-    if not os.path.isfile("config.yml"):
-        with open("config.yml", "x") as writer:
-            yaml.dump({"email": ""}, writer)
-
-    return yaml.safe_load(open("config.yml"))
+        return yaml.safe_load(open("config.yml"))
